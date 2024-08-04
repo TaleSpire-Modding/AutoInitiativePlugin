@@ -112,7 +112,7 @@ namespace AutoInitiative.Patches
                     num = 0;
                     if (resultsGroup.Name != null && Convert.ToString(resultsGroup.Name).Trim() != "")
                     {
-                        if (resultsGroup.Name.Contains("Initiative", StringComparison.OrdinalIgnoreCase))
+                        if (resultsGroup.Name.Contains(AutoInitiativePlugin.InitiativeText.Value, StringComparison.OrdinalIgnoreCase))
                         {
                             flag = true;
                         }
