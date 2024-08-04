@@ -8,7 +8,7 @@ namespace AutoInitiative.Patches
     internal static class InitUtils
     {
         internal static bool EditIsOpen = false;
-        internal static Dictionary<CreatureGuid, int> Initiatives = new Dictionary<CreatureGuid, int>();
+        internal static Dictionary<CreatureGuid, (int, int)> Initiatives = new Dictionary<CreatureGuid, (int, int)>();
 
         internal static void ClearInitiatives()
         {
@@ -19,7 +19,8 @@ namespace AutoInitiative.Patches
         internal static void SetInitiatives()
         {
             CreatureGuid[] array = Initiatives
-                .OrderByDescending(entry => entry.Value)
+                .OrderByDescending(entry => entry.Value.Item1)
+                .ThenByDescending(entry => entry.Value.Item2)
                 .Select(entry => { AutoInitiativePlugin.logger.LogInfo($"{entry.Value}: {entry.Key}"); return entry.Key; }).ToArray();
 
             InitiativeManager.SetEditQueue(array);
@@ -86,9 +87,11 @@ namespace AutoInitiative.Patches
 
                 bool flag = false;
                 int num = 0;
-                int num2 = 0;
-                num2 = 0;
-                
+                int initiativeResult = 0;
+                initiativeResult = 0;
+
+                int initiativeModifier = 0;
+
                 foreach (DiceManager.RollResultsGroup resultsGroup in thing.ResultsGroups)
                 {
                     num = 0;
@@ -111,10 +114,11 @@ namespace AutoInitiative.Patches
                         num = 1;
                         try
                         {
-                            num = ((operation.Operator != DiceManager.DiceOperator.Subtract) ? 1 : (-1));
+                            num = (operation.Operator != DiceManager.DiceOperator.Subtract) ? 1 : (-1);
                         }
                         catch (Exception)
                         {
+
                         }
 
                         if (operation.Operands != null)
@@ -124,14 +128,18 @@ namespace AutoInitiative.Patches
                                 operand.Get(out operation, out result, out value);
                                 if (result.Kind.RegisteredName == "<unknown>")
                                 {
-                                    short value2 = value.Value;
-                                    num2 += value.Value * num;
+                                    int value2 = value.Value * num;
+                                    initiativeResult += value2;
+
+                                    initiativeModifier += value2;
+                                    AutoInitiativePlugin.logger.LogInfo("Initiative Modifier: " + initiativeModifier);
+                                    
                                     continue;
                                 }
 
                                 foreach (short result2 in result.Results)
                                 {
-                                    num2 += result2;
+                                    initiativeResult += result2;
                                 }
                             }
                         }
@@ -139,7 +147,7 @@ namespace AutoInitiative.Patches
                         {
                             foreach (short result3 in result.Results)
                             {
-                                num2 += result3;
+                                initiativeResult += result3;
                             }
                         }
                     }
@@ -173,8 +181,8 @@ namespace AutoInitiative.Patches
 
                     foreach(CreatureGuid c in creature)
                     {
-                        AutoInitiativePlugin.logger.LogInfo("Creature " + c + " rolled " + num2);
-                        InitUtils.Initiatives[c] = num2;
+                        AutoInitiativePlugin.logger.LogInfo("Creature " + c + " rolled " + initiativeResult);
+                        InitUtils.Initiatives[c] = (initiativeResult, initiativeModifier);
                     }
                     
                     InitUtils.SetInitiatives();
