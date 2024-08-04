@@ -13,6 +13,7 @@ This uses Bepinex and requires SetInjectionFlag plugin installed.
 5. Repeat until all minis have their initiative rolled (As you roll, they will be tracked in the Initiative Tracker)
 
 GM's can also lasso multiple minis and roll initiative for all of them at once using the shared result.
+Tied Initiatives are broken by their initiaitve bonus (If they have one).
 All Rolls need "Initiative" in the name to be picked up by the plugin (Case insensitive).
 
 ## Changelog
