@@ -107,6 +107,7 @@ namespace AutoInitiative.Patches
                 int initiativeModifier = 0;
 
                 // Loop through the dice roll results
+                // This section here is a modification of LA's code from their AutoInitiative plugin
                 foreach (DiceManager.RollResultsGroup resultsGroup in thing.ResultsGroups)
                 {
                     num = 0;
