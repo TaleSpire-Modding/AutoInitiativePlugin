@@ -1,6 +1,12 @@
 # Auto Initiative
 This plugin allows pulling the result of url invoked TS Dice rolls (Via browser or Symbiote) and update initiative tracking.
-All Rolls need "Initiative" in the name to be picked up by the plugin (Case insensitive).
+All Rolls need "Initiative" in the name to be picked up by the plugin (Case insensitive, Configurable).
+This mod was inspired by LA's original AutoInitiative plugin, the changes here are as follows:
+- Only the GM needs it installed
+- No Keybinds needed (Automatically pulls Die Results into initiative tracker when GM is editing Turn Order)
+- Reduced Netcode footprint and simpler install
+- GM's can roll initiative for an individual/group using a shared initiative modifier
+- Tie breaker for Initiative order is automated by the flat initiative modifier
 
 ## Install
 This uses Bepinex and requires SetInjectionFlag plugin installed.
