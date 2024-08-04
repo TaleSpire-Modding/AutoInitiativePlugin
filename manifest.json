@@ -1,11 +1,10 @@
 {
-    "name": "Auto_Dice_Cleanup",
+    "name": "Auto_Initiative",
     "version_number": "1.0.1",
-    "website_url": "https://github.com/TaleSpire-Modding/AutoDiceCleanupPlugin",
-    "description": "Cleans up your dice after alloted time.",
+    "website_url": "https://github.com/TaleSpire-Modding/AutoInitiativePlugin/",
+    "description": "Pulls initiative roll into initiative tracker",
     "dependencies": [
       "bbepisTaleSpire-BepInExPack-5.4.22",
-      "brcoding-SetInjectionFlagPlugin-2.5.1",
-      "HolloFox_TS-Logs_To_Sentry_Patch-1.0.1"
+      "brcoding-SetInjectionFlagPlugin-2.5.1"
     ]
 }
