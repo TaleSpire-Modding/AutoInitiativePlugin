@@ -13,7 +13,7 @@ namespace AutoInitiative
     {
         // constants
         public const string Guid = "org.hollofox.plugins.AutoInitiative";
-        internal const string Version = "1.0.0.0";
+        internal const string Version = "1.1.0.0";
 
         // Config
         internal static ConfigEntry<string> InitiativeText;

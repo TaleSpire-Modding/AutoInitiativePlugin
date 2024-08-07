@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static SRF.UI.ResponsiveResize;
 
 namespace AutoInitiative.Patches
 {
@@ -22,41 +23,45 @@ namespace AutoInitiative.Patches
         internal static void SetInitiatives()
         {
             // Sort the initiatives by initiative and modifier
-            CreatureGuid[] array = Initiatives
+            QueueElement[] array = Initiatives
                 .OrderByDescending(entry => entry.Value.Item1)
                 .ThenByDescending(entry => entry.Value.Item2)
-                .Select(entry => { AutoInitiativePlugin.logger.LogInfo($"{entry.Value}: {entry.Key}"); return entry.Key; }).ToArray();
+                .Select(entry => { AutoInitiativePlugin.logger.LogInfo($"{entry.Value}: {entry.Key}"); return entry.Key; })
+                .Select(e => new QueueElement(QueueElement.ElementType.Creature,e))
+                .ToArray();
 
             InitiativeManager.SetEditQueue(array);
         }
     }
 
     // Patch to remove a creature from the initiative list when it is removed from the edit queue
-    [HarmonyPatch(typeof(InitiativeManager), "RemoveCreatureFromEditQueue")]
+    [HarmonyPatch(typeof(InitiativeManager), "RemoveElementFromEditQueue")]
     public class InitiativeManagerRemoveCreatureFromEditQueuePatch
     {
-        static void Postfix(CreatureGuid creatureGuid)
+        static void Postfix(QueueElement element)
         {
             // Remove the creature from the initiative list
-            if (InitUtils.Initiatives.ContainsKey(creatureGuid))
+            if (element.Type == QueueElement.ElementType.Creature && InitUtils.Initiatives.ContainsKey(element.CreatureGuid))
             {
-                InitUtils.Initiatives.Remove(creatureGuid);
-                AutoInitiativePlugin.logger.LogInfo($"Removed {creatureGuid} from Initiative");
+                InitUtils.Initiatives.Remove(element.CreatureGuid);
+                AutoInitiativePlugin.logger.LogInfo($"Removed {element.CreatureGuid} from Initiative");
             }
         }
     }
 
     // Patch to remove a creature from the initiative list when it is released
-    [HarmonyPatch(typeof(InitiativeManager), "ReleaseCreature")]
+    [HarmonyPatch(typeof(InitiativeManager), "ReleaseElement", typeof(QueueElement))]
     public class InitiativeManagerReleaseCreaturePatch
     {
         // Remove the creature from the initiative list
-        static void Postfix(CreatureGuid creature)
+        static void Postfix(QueueElement queueElement)
         {
-            if (InitUtils.Initiatives.ContainsKey(creature))
+            var element = queueElement;
+            // Remove the creature from the initiative list
+            if (element.Type == QueueElement.ElementType.Creature && InitUtils.Initiatives.ContainsKey(element.CreatureGuid))
             {
-                InitUtils.Initiatives.Remove(creature);
-                AutoInitiativePlugin.logger.LogInfo($"Removed {creature} from Initiative");
+                InitUtils.Initiatives.Remove(element.CreatureGuid);
+                AutoInitiativePlugin.logger.LogInfo($"Removed {element.CreatureGuid} from Initiative");
             }
         }
     }
