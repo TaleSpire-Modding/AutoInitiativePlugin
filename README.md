@@ -23,6 +23,7 @@ Tied Initiatives are broken by their initiaitve bonus (If they have one).
 All Rolls need "Initiative" in the name to be picked up by the plugin (Case insensitive).
 
 ## Changelog
+- 1.1.0: AOE Initiative Update
 - 1.0.0: Initial release
 
 ## Who Needs The Plugin
