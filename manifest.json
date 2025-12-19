@@ -1,10 +1,10 @@
 {
     "name": "Auto_Initiative",
-    "version_number": "1.0.1",
+    "version_number": "1.2.0",
     "website_url": "https://github.com/TaleSpire-Modding/AutoInitiativePlugin/",
     "description": "Pulls initiative roll into initiative tracker",
     "dependencies": [
       "bbepisTaleSpire-BepInExPack-5.4.22",
-      "brcoding-SetInjectionFlagPlugin-2.5.1"
+      "brcoding-SetInjectionFlagPlugin-3.0.0"
     ]
 }

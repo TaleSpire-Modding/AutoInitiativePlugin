@@ -1,8 +1,10 @@
-﻿using HarmonyLib;
+﻿using Bounce.Unmanaged;
+using Dice;
+using GameChat.UI;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static SRF.UI.ResponsiveResize;
 
 namespace AutoInitiative.Patches
 {
@@ -91,19 +93,24 @@ namespace AutoInitiative.Patches
     }
 
     // Patch to receive the dice roll results and set the initiative of the creature
-    [HarmonyPatch(typeof(DiceManager), "RPC_DiceResult")]
+    [HarmonyPatch(typeof(DiceRollManager), "OnResults")]
     public class ReceiveDiceRolledPatch
     {
         
         // Receive the dice roll results and set the initiative of the creature
-        static void Postfix(bool isGmOnly, byte[] diceListData, PhotonMessageInfo msgInfo, BrSerialize.Reader ____reader)
+        static void Postfix(ClientGuid clientId, 
+            RollResults rollResults, 
+            bool isGmRoll, 
+            bool showResult, 
+            UIChatMessageManager.DiceResultsReference.ResultsOrigin resultsOrigin, 
+            NGuid optionalSymbioteInteropId)
         {
             // Check if the GM mode is active and the initiative manager is open
             if (LocalClient.IsInGmMode && InitUtils.EditIsOpen)
             {
                 // Deserialize the dice roll results
-                BrSerializeHelpers.DeserializeFromByteArray(____reader, diceListData, DiceManager.RollResults.Deserialize, out DiceManager.RollResults thing);
-
+                //BrSerializeHelpers.DeserializeFromByteArray(____reader, diceListData, DiceManager.RollResults.Deserialize, out DiceManager.RollResults thing);
+                var thing = rollResults;
                 bool flag = false;
                 int num = 0;
                 int initiativeResult = 0;
@@ -113,7 +120,7 @@ namespace AutoInitiative.Patches
 
                 // Loop through the dice roll results
                 // This section here is a modification of LA's code from their AutoInitiative plugin
-                foreach (DiceManager.RollResultsGroup resultsGroup in thing.ResultsGroups)
+                foreach (RollResults.RollGroup resultsGroup in thing.ResultsGroups)
                 {
                     num = 0;
                     if (resultsGroup.Name != null && Convert.ToString(resultsGroup.Name).Trim() != "")
@@ -131,13 +138,13 @@ namespace AutoInitiative.Patches
                     }
 
                     // Get the dice roll results
-                    DiceManager.RollOperand.Which which = resultsGroup.Result.Get(out DiceManager.RollResultsOperation operation, out DiceManager.RollResult result, out DiceManager.RollValue value);
-                    if (which.HasFlag(DiceManager.RollOperand.Which.Operation))
+                    RollResults.RollOperand.Which which = resultsGroup.Result.Get(out RollResults.RollOperation operation, out RollResults.RollResult result, out RollResults.RollValue value);
+                    if (which.HasFlag(RollResults.RollOperand.Which.Operation))
                     {
                         num = 1;
                         try
                         {
-                            num = (operation.Operator != DiceManager.DiceOperator.Subtract) ? 1 : (-1);
+                            num = (operation.Operator != DiceOperator.Subtract) ? 1 : (-1);
                         }
                         catch (Exception)
                         {
@@ -147,7 +154,7 @@ namespace AutoInitiative.Patches
                         // Loop through the dice roll operands and results
                         if (operation.Operands != null)
                         {
-                            foreach (DiceManager.RollOperand operand in operation.Operands)
+                            foreach (RollResults.RollOperand operand in operation.Operands)
                             {
                                 operand.Get(out operation, out result, out value);
                                 if (result.Kind.RegisteredName == "<unknown>")
@@ -183,7 +190,7 @@ namespace AutoInitiative.Patches
                     CreatureGuid[] creature = new CreatureGuid[0];
 
                     // Check if the creature is lassoed
-                    if (thing.ClientId == LocalClient.Id 
+                    if (clientId == LocalClient.Id 
                         && LocalClient.HasLassoedCreatures
                         && LocalClient.LassoedCount > 0
                         && LocalClient.TryGetLassoedCreatureIds(out var guids)
@@ -194,7 +201,7 @@ namespace AutoInitiative.Patches
                     }
                     else
                     {
-                        creature = new CreatureGuid[] { BoardSessionManager.GetLastSelectedCreatureGuid(thing.ClientId) };
+                        creature = new CreatureGuid[] { BoardSessionManager.GetLastSelectedCreatureGuid(clientId) };
                     }
 
                     // Remove any default values from the creature list
