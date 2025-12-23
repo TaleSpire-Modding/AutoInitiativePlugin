@@ -7,13 +7,14 @@ using BepInEx.Configuration;
 
 namespace AutoInitiative
 {
-    [BepInPlugin(Guid, "Auto Initiative Plugin", Version)]
+    [BepInPlugin(Guid, Name, Version)]
     [BepInDependency(SetInjectionFlag.Guid)]
     public class AutoInitiativePlugin : BaseUnityPlugin
     {
         // constants
         public const string Guid = "org.hollofox.plugins.AutoInitiative";
         internal const string Version = "0.0.0.0";
+        public const string Name = "Auto Initiative Plugin";
 
         // Config
         internal static ConfigEntry<string> InitiativeText;
