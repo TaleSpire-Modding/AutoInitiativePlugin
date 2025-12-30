@@ -23,6 +23,7 @@ Tied Initiatives are broken by their initiative bonus (If they have one).
 All Rolls need "Initiative" in the name to be picked up by the plugin (case-insensitive).
 
 ## Changelog
+- 1.2.1: DependencyUnityPlugins is now used and implement logic for unpatching
 - 1.2.0: Fix broken changes from TaleSpire dice update
 - 1.1.0: AOE Initiative Update
 - 1.0.0: Initial release
