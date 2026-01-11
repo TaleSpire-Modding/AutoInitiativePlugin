@@ -8,7 +8,7 @@ namespace AutoInitiative
 {
     [BepInPlugin(Guid, Name, Version)]
     [BepInDependency(SetInjectionFlag.Guid)]
-    public class AutoInitiativePlugin : DependencyUnityPlugin
+    public class AutoInitiativePlugin : DependencyUnityPlugin<AutoInitiativePlugin>
     {
         // constants
         public const string Guid = "org.hollofox.plugins.AutoInitiative";
@@ -21,16 +21,18 @@ namespace AutoInitiative
         internal static ManualLogSource logger;
         Harmony harmony;
 
+        protected override void OnSetupConfig(ConfigFile config)
+        {
+            InitiativeText = config.Bind("Initiative", "Required Text", "Initiative");
+        }
+
         /// <summary>
         /// Awake plugin
         /// </summary>
         protected override void OnAwake()
         {
             logger = Logger;
-
             Logger.LogDebug("Auto Initiative loaded");
-
-            InitiativeText = Config.Bind("Initiative", "Required Text", "Initiative");
 
             try {
                 harmony = new Harmony(Guid);
@@ -44,7 +46,7 @@ namespace AutoInitiative
 
         protected override void OnDestroyed()
         {
-            harmony.UnpatchSelf();
+            harmony?.UnpatchSelf();
             Patches.InitUtils.ClearInitiatives();
         }
     }
